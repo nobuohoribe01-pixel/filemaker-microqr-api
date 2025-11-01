@@ -4,7 +4,7 @@ from io import BytesIO
 
 app = Flask(__name__)
 
-@app.route('/api/microqr')
+@app.route('/')
 def generate_micro_qr():
     data_to_encode = request.args.get('data', '')
     if not data_to_encode:
