@@ -17,3 +17,4 @@ def generate_micro_qr():
         return send_file(buffer, mimetype='image/png')
     except Exception as e:
         return f"Error: {e}", 500
+```    *   **変更点:** 7行目の `@app.route()` の中から `/api` を削除し、`/microqr` だけにしました。
