@@ -5,6 +5,7 @@ import segno
 app = Flask(__name__)
 
 @app.get("/")
+
 def microqr():
     data = request.args.get("data", "")
     if not data:
