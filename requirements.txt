@@ -1,2 +1,2 @@
-Flask
-segno
+flask==3.*
+segno==1.*
