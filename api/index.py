@@ -29,7 +29,6 @@ def get_choice(name, default, choices, transform=str.upper):
 
 def build_png(data, ver, ecc, scale, quiet, dpi, invert):
     qr = segno.make(data, micro=True, version=ver, error=ecc)
-    from io import BytesIO
     buf = BytesIO()
     qr.save(
         buf, kind="png",
@@ -44,11 +43,11 @@ def handle():
     if not data:
         abort(400, "data required")
 
-    ver  = get_choice("ver",  "M3", {"M1","M2","M3","M4"})
-    ecc  = get_choice("ecc",  "M",  {"L","M","Q"})
-    scale = get_int("scale", 8, 1, 64)
-    quiet = get_int("quiet", 2, 0, 16)
-    dpi   = get_int("dpi",   600, 72, 1200)
+    ver    = get_choice("ver",  "M3", {"M1","M2","M3","M4"})
+    ecc    = get_choice("ecc",  "M",  {"L","M","Q"})
+    scale  = get_int("scale",  8, 1, 64)
+    quiet  = get_int("quiet",  2, 0, 16)
+    dpi    = get_int("dpi",   600, 72, 1200)
     invert = request.args.get("invert","0").lower() in ("1","true","yes")
 
     try:
