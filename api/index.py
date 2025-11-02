@@ -4,34 +4,52 @@ import segno
 
 app = Flask(__name__)
 
-def clamp(v, lo, hi): 
+def clamp(v, lo, hi):
     return max(lo, min(hi, v))
+
+def get_int(name, default, lo=None, hi=None):
+    raw = request.args.get(name, None)
+    if raw is None or raw == "":
+        v = default
+    else:
+        try:
+            v = int(raw)
+        except Exception:
+            v = default
+    if lo is not None and hi is not None:
+        v = clamp(v, lo, hi)
+    return v
+
+def get_choice(name, default, choices, transform=str.upper):
+    raw = request.args.get(name, None)
+    if raw is None or raw == "":
+        return default
+    val = transform(raw) if transform else raw
+    return val if val in choices else default
 
 def build_png(data, ver, ecc, scale, quiet, dpi, invert):
     qr = segno.make(data, micro=True, version=ver, error=ecc)
+    from io import BytesIO
     buf = BytesIO()
-    qr.save(buf, kind="png", scale=scale, border=quiet, dpi=dpi,
-            dark=("white" if invert else "black"),
-            light=("black" if invert else "white"))
+    qr.save(
+        buf, kind="png",
+        scale=scale, border=quiet, dpi=dpi,
+        dark=("white" if invert else "black"),
+        light=("black" if invert else "white"),
+    )
     return buf.getvalue()
 
 def handle():
-    data = request.args.get("data","")
+    data = request.args.get("data", "")
     if not data:
         abort(400, "data required")
 
-    ver = request.args.get("ver","M3").upper()
-    if ver not in ("M1","M2","M3","M4"):
-        abort(400, "ver must be M1|M2|M3|M4")
-
-    ecc = request.args.get("ecc","M").upper()
-    if ecc not in ("L","M","Q"):
-        abort(400, "ecc must be L|M|Q")
-
-    scale = clamp(int(request.args.get("scale", 8)), 1, 64)
-    quiet = clamp(int(request.args.get("quiet", 2)), 0, 16)
-    dpi   = clamp(int(request.args.get("dpi", 600)), 72, 1200)
-    invert = request.args.get("invert","0") in ("1","true","True")
+    ver  = get_choice("ver",  "M3", {"M1","M2","M3","M4"})
+    ecc  = get_choice("ecc",  "M",  {"L","M","Q"})
+    scale = get_int("scale", 8, 1, 64)
+    quiet = get_int("quiet", 2, 0, 16)
+    dpi   = get_int("dpi",   600, 72, 1200)
+    invert = request.args.get("invert","0").lower() in ("1","true","yes")
 
     try:
         png = build_png(data, ver, ecc, scale, quiet, dpi, invert)
@@ -44,4 +62,3 @@ def handle():
 @app.get("/microqr")
 def microqr():
     return handle()
-
