@@ -1,14 +1,6 @@
 {
-  "builds": [
-    {
-      "src": "api/app.py",
-      "use": "@vercel/python"
-    }
-  ],
+  "functions": { "api/index.py": { "runtime": "python3.11" } },
   "routes": [
-    {
-      "src": "/api/app/(.*)",
-      "dest": "api/app.py"
-    }
+    { "src": "/microqr", "dest": "/api/index.py" }
   ]
 }
