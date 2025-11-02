@@ -1,6 +1,0 @@
-{
-  "functions": { "api/index.py": { "runtime": "python3.11" } },
-  "routes": [
-    { "src": "/microqr", "dest": "/api/index.py" }
-  ]
-}
